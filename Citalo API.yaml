@@ -1,0 +1,4302 @@
+openapi: 3.0.3
+info:
+  title: Citalo API
+  version: 1.0.0
+  description: API completa para el sistema de reservas Citalo - Plataforma de gestión
+    de citas para negocios
+paths:
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: Vista personalizada para autenticación con token
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthTokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuthTokenRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthTokenRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+          description: ''
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: Vista para logout que elimina el token
+      tags:
+      - auth
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/bloqueos-horario/:
+    get:
+      operationId: bloqueos_horario_list
+      description: ViewSet para gestión de bloqueos de horario
+      parameters:
+      - in: query
+        name: activo
+        schema:
+          type: boolean
+      - in: query
+        name: activos_en_fecha
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: empleado
+        schema:
+          type: integer
+      - in: query
+        name: fecha_desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: fecha_hasta
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: negocio
+        schema:
+          type: string
+          format: uuid
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: tipo_bloqueo
+        schema:
+          type: string
+          enum:
+          - festivo
+          - mantenimiento
+          - otro
+          - personal
+          - vacaciones
+        description: |-
+          * `vacaciones` - Vacaciones
+          * `festivo` - Día Festivo
+          * `mantenimiento` - Mantenimiento
+          * `personal` - Motivos Personales
+          * `otro` - Otro
+      tags:
+      - bloqueos-horario
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBloqueoHorarioList'
+          description: ''
+    post:
+      operationId: bloqueos_horario_create
+      description: ViewSet para gestión de bloqueos de horario
+      tags:
+      - bloqueos-horario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloqueoHorarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloqueoHorarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloqueoHorarioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloqueoHorario'
+          description: ''
+  /api/bloqueos-horario/{id}/:
+    get:
+      operationId: bloqueos_horario_retrieve
+      description: ViewSet para gestión de bloqueos de horario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Bloqueo de Horario.
+        required: true
+      tags:
+      - bloqueos-horario
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloqueoHorario'
+          description: ''
+    put:
+      operationId: bloqueos_horario_update
+      description: ViewSet para gestión de bloqueos de horario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Bloqueo de Horario.
+        required: true
+      tags:
+      - bloqueos-horario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloqueoHorarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloqueoHorarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloqueoHorarioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloqueoHorario'
+          description: ''
+    patch:
+      operationId: bloqueos_horario_partial_update
+      description: ViewSet para gestión de bloqueos de horario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Bloqueo de Horario.
+        required: true
+      tags:
+      - bloqueos-horario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBloqueoHorarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBloqueoHorarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBloqueoHorarioRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloqueoHorario'
+          description: ''
+    delete:
+      operationId: bloqueos_horario_destroy
+      description: ViewSet para gestión de bloqueos de horario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Bloqueo de Horario.
+        required: true
+      tags:
+      - bloqueos-horario
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/categorias-negocio/:
+    get:
+      operationId: categorias_negocio_list
+      description: ViewSet de solo lectura para categorías de negocio
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - categorias-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoriaNegocioList'
+          description: ''
+  /api/categorias-negocio/{id}/:
+    get:
+      operationId: categorias_negocio_retrieve
+      description: ViewSet de solo lectura para categorías de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Categoría de Negocio.
+        required: true
+      tags:
+      - categorias-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaNegocio'
+          description: ''
+  /api/citas/:
+    get:
+      operationId: citas_list
+      description: ViewSet para gestión de citas
+      parameters:
+      - in: query
+        name: año
+        schema:
+          type: number
+      - in: query
+        name: cliente
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: cliente_nombre
+        schema:
+          type: string
+      - in: query
+        name: empleado
+        schema:
+          type: integer
+      - in: query
+        name: estado
+        schema:
+          type: string
+          enum:
+          - cancelada_cliente
+          - cancelada_negocio
+          - completada
+          - confirmada
+          - en_curso
+          - no_asistio
+          - pendiente
+        description: |-
+          * `pendiente` - Pendiente de Confirmación
+          * `confirmada` - Confirmada
+          * `en_curso` - En Curso
+          * `completada` - Completada
+          * `cancelada_cliente` - Cancelada por Cliente
+          * `cancelada_negocio` - Cancelada por Negocio
+          * `no_asistio` - No Asistió
+      - in: query
+        name: fecha_desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: fecha_hasta
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: mes
+        schema:
+          type: number
+      - in: query
+        name: negocio
+        schema:
+          type: string
+          format: uuid
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: precio_desde
+        schema:
+          type: number
+      - in: query
+        name: precio_hasta
+        schema:
+          type: number
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: servicio
+        schema:
+          type: integer
+      tags:
+      - citas
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCitaList'
+          description: ''
+    post:
+      operationId: citas_create
+      description: ViewSet para gestión de citas
+      tags:
+      - citas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CitaCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CitaCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CitaCreateRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CitaCreate'
+          description: ''
+  /api/citas/{id}/:
+    get:
+      operationId: citas_retrieve
+      description: ViewSet para gestión de citas
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Cita.
+        required: true
+      tags:
+      - citas
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cita'
+          description: ''
+    put:
+      operationId: citas_update
+      description: ViewSet para gestión de citas
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Cita.
+        required: true
+      tags:
+      - citas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CitaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CitaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CitaRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cita'
+          description: ''
+    patch:
+      operationId: citas_partial_update
+      description: ViewSet para gestión de citas
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Cita.
+        required: true
+      tags:
+      - citas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCitaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCitaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCitaRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cita'
+          description: ''
+    delete:
+      operationId: citas_destroy
+      description: ViewSet para gestión de citas
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Cita.
+        required: true
+      tags:
+      - citas
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/citas/{id}/cambiar_estado/:
+    patch:
+      operationId: citas_cambiar_estado_partial_update
+      description: Cambiar estado de una cita
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Cita.
+        required: true
+      tags:
+      - citas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCitaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCitaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCitaRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cita'
+          description: ''
+  /api/configuracion/:
+    get:
+      operationId: configuracion_list
+      description: ViewSet de solo lectura para configuración de plataforma
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - configuracion
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConfiguracionPlataformaList'
+          description: ''
+  /api/configuracion/{id}/:
+    get:
+      operationId: configuracion_retrieve
+      description: ViewSet de solo lectura para configuración de plataforma
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Configuración de Plataforma.
+        required: true
+      tags:
+      - configuracion
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfiguracionPlataforma'
+          description: ''
+  /api/empleados-negocio/:
+    get:
+      operationId: empleados_negocio_list
+      description: ViewSet para gestión de empleados de negocio
+      parameters:
+      - in: query
+        name: activo
+        schema:
+          type: boolean
+      - in: query
+        name: especialidad
+        schema:
+          type: string
+      - in: query
+        name: negocio
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: nombre_empleado
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: tipo_empleado
+        schema:
+          type: string
+          enum:
+          - administrador
+          - consultor
+          - empleado
+        description: |-
+          * `administrador` - Administrador
+          * `empleado` - Empleado Regular
+          * `consultor` - Consultor/Freelancer
+      tags:
+      - empleados-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEmpleadoNegocioList'
+          description: ''
+    post:
+      operationId: empleados_negocio_create
+      description: ViewSet para gestión de empleados de negocio
+      tags:
+      - empleados-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmpleadoNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmpleadoNegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoNegocio'
+          description: ''
+  /api/empleados-negocio/{id}/:
+    get:
+      operationId: empleados_negocio_retrieve
+      description: ViewSet para gestión de empleados de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Empleado de Negocio.
+        required: true
+      tags:
+      - empleados-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoNegocio'
+          description: ''
+    put:
+      operationId: empleados_negocio_update
+      description: ViewSet para gestión de empleados de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Empleado de Negocio.
+        required: true
+      tags:
+      - empleados-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmpleadoNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmpleadoNegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoNegocio'
+          description: ''
+    patch:
+      operationId: empleados_negocio_partial_update
+      description: ViewSet para gestión de empleados de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Empleado de Negocio.
+        required: true
+      tags:
+      - empleados-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEmpleadoNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEmpleadoNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEmpleadoNegocioRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoNegocio'
+          description: ''
+    delete:
+      operationId: empleados_negocio_destroy
+      description: ViewSet para gestión de empleados de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Empleado de Negocio.
+        required: true
+      tags:
+      - empleados-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/facturacion/:
+    get:
+      operationId: facturacion_list
+      description: ViewSet de solo lectura para facturación
+      parameters:
+      - in: query
+        name: estado_pago
+        schema:
+          type: string
+          enum:
+          - cancelado
+          - fallido
+          - pagado
+          - pendiente
+          - reembolsado
+        description: |-
+          * `pendiente` - Pendiente
+          * `pagado` - Pagado
+          * `fallido` - Fallido
+          * `reembolsado` - Reembolsado
+          * `cancelado` - Cancelado
+      - in: query
+        name: moneda
+        schema:
+          type: string
+      - in: query
+        name: monto_desde
+        schema:
+          type: number
+      - in: query
+        name: monto_hasta
+        schema:
+          type: number
+      - in: query
+        name: negocio
+        schema:
+          type: string
+          format: uuid
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: periodo_desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: periodo_hasta
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: vencimiento_proximo
+        schema:
+          type: boolean
+      tags:
+      - facturacion
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFacturacionSuscripcionList'
+          description: ''
+  /api/facturacion/{id}/:
+    get:
+      operationId: facturacion_retrieve
+      description: ViewSet de solo lectura para facturación
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Facturación de Suscripción.
+        required: true
+      tags:
+      - facturacion
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacturacionSuscripcion'
+          description: ''
+  /api/horarios-negocio/:
+    get:
+      operationId: horarios_negocio_list
+      description: ViewSet para gestión de horarios de negocio
+      parameters:
+      - in: query
+        name: activo
+        schema:
+          type: boolean
+      - in: query
+        name: dia_semana
+        schema:
+          type: integer
+          enum:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+        description: |-
+          * `0` - Lunes
+          * `1` - Martes
+          * `2` - Miércoles
+          * `3` - Jueves
+          * `4` - Viernes
+          * `5` - Sábado
+          * `6` - Domingo
+      - in: query
+        name: negocio
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - horarios-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHorarioNegocioList'
+          description: ''
+    post:
+      operationId: horarios_negocio_create
+      description: ViewSet para gestión de horarios de negocio
+      tags:
+      - horarios-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HorarioNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HorarioNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HorarioNegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HorarioNegocio'
+          description: ''
+  /api/horarios-negocio/{id}/:
+    get:
+      operationId: horarios_negocio_retrieve
+      description: ViewSet para gestión de horarios de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Horario de Negocio.
+        required: true
+      tags:
+      - horarios-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HorarioNegocio'
+          description: ''
+    put:
+      operationId: horarios_negocio_update
+      description: ViewSet para gestión de horarios de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Horario de Negocio.
+        required: true
+      tags:
+      - horarios-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HorarioNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HorarioNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HorarioNegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HorarioNegocio'
+          description: ''
+    patch:
+      operationId: horarios_negocio_partial_update
+      description: ViewSet para gestión de horarios de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Horario de Negocio.
+        required: true
+      tags:
+      - horarios-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedHorarioNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedHorarioNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedHorarioNegocioRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HorarioNegocio'
+          description: ''
+    delete:
+      operationId: horarios_negocio_destroy
+      description: ViewSet para gestión de horarios de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Horario de Negocio.
+        required: true
+      tags:
+      - horarios-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/negocios/:
+    get:
+      operationId: negocios_list
+      description: ViewSet para gestión de negocios
+      parameters:
+      - in: query
+        name: activo
+        schema:
+          type: boolean
+      - in: query
+        name: calificacion_minima
+        schema:
+          type: number
+      - in: query
+        name: categoria
+        schema:
+          type: integer
+      - in: query
+        name: cerca_de
+        schema:
+          type: string
+        description: Cerca de (ciudad/provincia)
+      - in: query
+        name: ciudad
+        schema:
+          type: string
+      - in: query
+        name: ciudad__icontains
+        schema:
+          type: string
+      - in: query
+        name: con_disponibilidad
+        schema:
+          type: boolean
+        description: Con disponibilidad hoy
+      - in: query
+        name: estado_suscripcion
+        schema:
+          type: string
+          enum:
+          - activa
+          - cancelada
+          - pendiente_pago
+          - prueba
+          - suspendida
+        description: |-
+          * `activa` - Activa
+          * `pendiente_pago` - Pendiente de Pago
+          * `suspendida` - Suspendida
+          * `cancelada` - Cancelada
+          * `prueba` - Período de Prueba
+      - in: query
+        name: nombre
+        schema:
+          type: string
+        description: Nombre del negocio
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: precio_desde
+        schema:
+          type: number
+        description: Precio mínimo de servicios
+      - in: query
+        name: precio_hasta
+        schema:
+          type: number
+        description: Precio máximo de servicios
+      - in: query
+        name: provincia
+        schema:
+          type: string
+      - in: query
+        name: provincia__icontains
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: verificado
+        schema:
+          type: boolean
+      tags:
+      - negocios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNegocioList'
+          description: ''
+    post:
+      operationId: negocios_create
+      description: ViewSet para gestión de negocios
+      tags:
+      - negocios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Negocio'
+          description: ''
+  /api/negocios/{id}/:
+    get:
+      operationId: negocios_retrieve
+      description: ViewSet para gestión de negocios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Negocio.
+        required: true
+      tags:
+      - negocios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Negocio'
+          description: ''
+    put:
+      operationId: negocios_update
+      description: ViewSet para gestión de negocios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Negocio.
+        required: true
+      tags:
+      - negocios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Negocio'
+          description: ''
+    patch:
+      operationId: negocios_partial_update
+      description: ViewSet para gestión de negocios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Negocio.
+        required: true
+      tags:
+      - negocios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNegocioRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Negocio'
+          description: ''
+    delete:
+      operationId: negocios_destroy
+      description: ViewSet para gestión de negocios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Negocio.
+        required: true
+      tags:
+      - negocios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/negocios/{id}/disponibilidad/:
+    get:
+      operationId: negocios_disponibilidad_retrieve
+      description: Consultar disponibilidad de horarios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Negocio.
+        required: true
+      tags:
+      - negocios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Negocio'
+          description: ''
+  /api/negocios/{id}/estadisticas/:
+    get:
+      operationId: negocios_estadisticas_retrieve
+      description: Obtener estadísticas del negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Negocio.
+        required: true
+      tags:
+      - negocios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Negocio'
+          description: ''
+  /api/reseñas/:
+    get:
+      operationId: reseñas_list
+      description: ViewSet para gestión de reseñas de negocio
+      parameters:
+      - in: query
+        name: activa
+        schema:
+          type: boolean
+      - in: query
+        name: calificacion
+        schema:
+          type: integer
+      - in: query
+        name: calificacion_maxima
+        schema:
+          type: integer
+      - in: query
+        name: calificacion_minima
+        schema:
+          type: integer
+      - in: query
+        name: cliente
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: con_respuesta
+        schema:
+          type: boolean
+      - in: query
+        name: fecha_desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: fecha_hasta
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: negocio
+        schema:
+          type: string
+          format: uuid
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - reseñas
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReseñaNegocioList'
+          description: ''
+    post:
+      operationId: reseñas_create
+      description: ViewSet para gestión de reseñas de negocio
+      tags:
+      - reseñas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReseñaNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReseñaNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReseñaNegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReseñaNegocio'
+          description: ''
+  /api/reseñas/{id}/:
+    get:
+      operationId: reseñas_retrieve
+      description: ViewSet para gestión de reseñas de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Reseña de Negocio.
+        required: true
+      tags:
+      - reseñas
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReseñaNegocio'
+          description: ''
+    put:
+      operationId: reseñas_update
+      description: ViewSet para gestión de reseñas de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Reseña de Negocio.
+        required: true
+      tags:
+      - reseñas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReseñaNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReseñaNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReseñaNegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReseñaNegocio'
+          description: ''
+    patch:
+      operationId: reseñas_partial_update
+      description: ViewSet para gestión de reseñas de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Reseña de Negocio.
+        required: true
+      tags:
+      - reseñas
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReseñaNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedReseñaNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedReseñaNegocioRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReseñaNegocio'
+          description: ''
+    delete:
+      operationId: reseñas_destroy
+      description: ViewSet para gestión de reseñas de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Reseña de Negocio.
+        required: true
+      tags:
+      - reseñas
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/servicios-negocio/:
+    get:
+      operationId: servicios_negocio_list
+      description: ViewSet para gestión de servicios de negocio
+      parameters:
+      - in: query
+        name: activo
+        schema:
+          type: boolean
+      - in: query
+        name: disponible_online
+        schema:
+          type: boolean
+      - in: query
+        name: duracion_desde
+        schema:
+          type: integer
+      - in: query
+        name: duracion_hasta
+        schema:
+          type: integer
+      - in: query
+        name: negocio
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: nombre
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: precio_desde
+        schema:
+          type: number
+      - in: query
+        name: precio_hasta
+        schema:
+          type: number
+      - in: query
+        name: requiere_confirmacion
+        schema:
+          type: boolean
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - servicios-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServicioNegocioList'
+          description: ''
+    post:
+      operationId: servicios_negocio_create
+      description: ViewSet para gestión de servicios de negocio
+      tags:
+      - servicios-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicioNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServicioNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ServicioNegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicioNegocio'
+          description: ''
+  /api/servicios-negocio/{id}/:
+    get:
+      operationId: servicios_negocio_retrieve
+      description: ViewSet para gestión de servicios de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Servicio de Negocio.
+        required: true
+      tags:
+      - servicios-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicioNegocio'
+          description: ''
+    put:
+      operationId: servicios_negocio_update
+      description: ViewSet para gestión de servicios de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Servicio de Negocio.
+        required: true
+      tags:
+      - servicios-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicioNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServicioNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ServicioNegocioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicioNegocio'
+          description: ''
+    patch:
+      operationId: servicios_negocio_partial_update
+      description: ViewSet para gestión de servicios de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Servicio de Negocio.
+        required: true
+      tags:
+      - servicios-negocio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedServicioNegocioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedServicioNegocioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedServicioNegocioRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicioNegocio'
+          description: ''
+    delete:
+      operationId: servicios_negocio_destroy
+      description: ViewSet para gestión de servicios de negocio
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Servicio de Negocio.
+        required: true
+      tags:
+      - servicios-negocio
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/usuarios/:
+    get:
+      operationId: usuarios_retrieve
+      description: ViewSet para gestión de usuarios
+      tags:
+      - usuarios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: usuarios_create
+      description: ViewSet para gestión de usuarios
+      tags:
+      - usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+  /api/usuarios/{id}/:
+    get:
+      operationId: usuarios_retrieve_2
+      description: ViewSet para gestión de usuarios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuario.
+        required: true
+      tags:
+      - usuarios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: usuarios_update
+      description: ViewSet para gestión de usuarios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuario.
+        required: true
+      tags:
+      - usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+    patch:
+      operationId: usuarios_partial_update
+      description: ViewSet para gestión de usuarios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuario.
+        required: true
+      tags:
+      - usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+    delete:
+      operationId: usuarios_destroy
+      description: ViewSet para gestión de usuarios
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuario.
+        required: true
+      tags:
+      - usuarios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/usuarios/{id}/change_password/:
+    post:
+      operationId: usuarios_change_password_create
+      description: Cambiar contraseña del usuario
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this Usuario.
+        required: true
+      tags:
+      - usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+  /api/usuarios/me/:
+    get:
+      operationId: usuarios_me_retrieve
+      description: Endpoint para obtener/actualizar el perfil del usuario actual
+      tags:
+      - usuarios
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+    patch:
+      operationId: usuarios_me_partial_update
+      description: Endpoint para obtener/actualizar el perfil del usuario actual
+      tags:
+      - usuarios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+components:
+  schemas:
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+          readOnly: true
+      required:
+      - token
+    AuthTokenRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - username
+    BlankEnum:
+      enum:
+      - ''
+    BloqueoHorario:
+      type: object
+      description: Serializer para BloqueoHorario
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        negocio:
+          type: string
+          format: uuid
+        empleado:
+          type: integer
+          nullable: true
+          description: Si se especifica, el bloqueo aplica solo a este empleado
+        fecha_inicio:
+          type: string
+          format: date-time
+        fecha_fin:
+          type: string
+          format: date-time
+        tipo_bloqueo:
+          $ref: '#/components/schemas/TipoBloqueoEnum'
+        motivo:
+          type: string
+        activo:
+          type: boolean
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+        negocio_info:
+          type: string
+          readOnly: true
+        empleado_info:
+          allOf:
+          - $ref: '#/components/schemas/UsuarioPublic'
+          readOnly: true
+        tipo_bloqueo_display:
+          type: string
+          readOnly: true
+      required:
+      - empleado_info
+      - fecha_creacion
+      - fecha_fin
+      - fecha_inicio
+      - id
+      - negocio
+      - negocio_info
+      - tipo_bloqueo_display
+    BloqueoHorarioRequest:
+      type: object
+      description: Serializer para BloqueoHorario
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        empleado:
+          type: integer
+          nullable: true
+          description: Si se especifica, el bloqueo aplica solo a este empleado
+        fecha_inicio:
+          type: string
+          format: date-time
+        fecha_fin:
+          type: string
+          format: date-time
+        tipo_bloqueo:
+          $ref: '#/components/schemas/TipoBloqueoEnum'
+        motivo:
+          type: string
+        activo:
+          type: boolean
+      required:
+      - fecha_fin
+      - fecha_inicio
+      - negocio
+    CategoriaNegocio:
+      type: object
+      description: Serializer para CategoriaNegocio
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 100
+        descripcion:
+          type: string
+        icono:
+          type: string
+          description: Clase CSS o nombre del icono
+          maxLength: 50
+        activa:
+          type: boolean
+        orden:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Orden de visualización
+        duracion_cita_default:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Duración por defecto de las citas en minutos
+        permite_citas_online:
+          type: boolean
+        requiere_confirmacion:
+          type: boolean
+        total_negocios:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - nombre
+      - total_negocios
+    CategoriaNegocioRequest:
+      type: object
+      description: Serializer para CategoriaNegocio
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+        descripcion:
+          type: string
+        icono:
+          type: string
+          description: Clase CSS o nombre del icono
+          maxLength: 50
+        activa:
+          type: boolean
+        orden:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Orden de visualización
+        duracion_cita_default:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Duración por defecto de las citas en minutos
+        permite_citas_online:
+          type: boolean
+        requiere_confirmacion:
+          type: boolean
+      required:
+      - nombre
+    Cita:
+      type: object
+      description: Serializer para Cita
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        negocio:
+          type: string
+          format: uuid
+        cliente:
+          type: string
+          format: uuid
+        empleado:
+          type: integer
+          nullable: true
+        servicio:
+          type: integer
+        fecha_hora_inicio:
+          type: string
+          format: date-time
+        fecha_hora_fin:
+          type: string
+          format: date-time
+          readOnly: true
+        estado:
+          $ref: '#/components/schemas/EstadoEnum'
+        nombre_cliente:
+          type: string
+          description: Nombre completo del cliente para la cita
+          maxLength: 200
+        telefono_cliente:
+          type: string
+          maxLength: 20
+        email_cliente:
+          type: string
+          format: email
+          maxLength: 254
+        notas_cliente:
+          type: string
+          description: Notas adicionales del cliente
+        notas_internas:
+          type: string
+          description: Notas internas del negocio
+        precio_final:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        recordatorio_enviado:
+          type: boolean
+        confirmacion_enviada:
+          type: boolean
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+        fecha_actualizacion:
+          type: string
+          format: date-time
+          readOnly: true
+        fecha_cancelacion:
+          type: string
+          format: date-time
+          nullable: true
+        cita_original:
+          type: string
+          format: uuid
+          nullable: true
+        negocio_info:
+          allOf:
+          - $ref: '#/components/schemas/Negocio'
+          readOnly: true
+        cliente_info:
+          allOf:
+          - $ref: '#/components/schemas/UsuarioPublic'
+          readOnly: true
+        empleado_info:
+          allOf:
+          - $ref: '#/components/schemas/UsuarioPublic'
+          readOnly: true
+        servicio_info:
+          allOf:
+          - $ref: '#/components/schemas/ServicioNegocio'
+          readOnly: true
+        estado_display:
+          type: string
+          readOnly: true
+        precio_final_formateado:
+          type: string
+          readOnly: true
+        duracion_minutos:
+          type: string
+          readOnly: true
+      required:
+      - cliente
+      - cliente_info
+      - duracion_minutos
+      - email_cliente
+      - empleado_info
+      - estado_display
+      - fecha_actualizacion
+      - fecha_creacion
+      - fecha_hora_fin
+      - fecha_hora_inicio
+      - id
+      - negocio
+      - negocio_info
+      - nombre_cliente
+      - precio_final
+      - precio_final_formateado
+      - servicio
+      - servicio_info
+      - telefono_cliente
+    CitaCreate:
+      type: object
+      description: Serializer específico para crear citas
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        empleado:
+          type: integer
+          nullable: true
+        servicio:
+          type: integer
+        fecha_hora_inicio:
+          type: string
+          format: date-time
+        nombre_cliente:
+          type: string
+          description: Nombre completo del cliente para la cita
+          maxLength: 200
+        telefono_cliente:
+          type: string
+          maxLength: 20
+        email_cliente:
+          type: string
+          format: email
+          maxLength: 254
+        notas_cliente:
+          type: string
+          description: Notas adicionales del cliente
+      required:
+      - email_cliente
+      - fecha_hora_inicio
+      - negocio
+      - nombre_cliente
+      - servicio
+      - telefono_cliente
+    CitaCreateRequest:
+      type: object
+      description: Serializer específico para crear citas
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        empleado:
+          type: integer
+          nullable: true
+        servicio:
+          type: integer
+        fecha_hora_inicio:
+          type: string
+          format: date-time
+        nombre_cliente:
+          type: string
+          minLength: 1
+          description: Nombre completo del cliente para la cita
+          maxLength: 200
+        telefono_cliente:
+          type: string
+          minLength: 1
+          maxLength: 20
+        email_cliente:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        notas_cliente:
+          type: string
+          description: Notas adicionales del cliente
+      required:
+      - email_cliente
+      - fecha_hora_inicio
+      - negocio
+      - nombre_cliente
+      - servicio
+      - telefono_cliente
+    CitaRequest:
+      type: object
+      description: Serializer para Cita
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        cliente:
+          type: string
+          format: uuid
+        empleado:
+          type: integer
+          nullable: true
+        servicio:
+          type: integer
+        fecha_hora_inicio:
+          type: string
+          format: date-time
+        estado:
+          $ref: '#/components/schemas/EstadoEnum'
+        nombre_cliente:
+          type: string
+          minLength: 1
+          description: Nombre completo del cliente para la cita
+          maxLength: 200
+        telefono_cliente:
+          type: string
+          minLength: 1
+          maxLength: 20
+        email_cliente:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        notas_cliente:
+          type: string
+          description: Notas adicionales del cliente
+        notas_internas:
+          type: string
+          description: Notas internas del negocio
+        recordatorio_enviado:
+          type: boolean
+        confirmacion_enviada:
+          type: boolean
+        fecha_cancelacion:
+          type: string
+          format: date-time
+          nullable: true
+        cita_original:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - cliente
+      - email_cliente
+      - fecha_hora_inicio
+      - negocio
+      - nombre_cliente
+      - servicio
+      - telefono_cliente
+    ConfiguracionPlataforma:
+      type: object
+      description: Serializer para ConfiguracionPlataforma
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        clave:
+          type: string
+          maxLength: 100
+        valor:
+          type: string
+        descripcion:
+          type: string
+        tipo_dato:
+          $ref: '#/components/schemas/TipoDatoEnum'
+        activa:
+          type: boolean
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+        fecha_actualizacion:
+          type: string
+          format: date-time
+          readOnly: true
+        valor_procesado:
+          type: string
+          readOnly: true
+      required:
+      - clave
+      - fecha_actualizacion
+      - fecha_creacion
+      - id
+      - valor
+      - valor_procesado
+    DiaSemanaEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - Lunes
+        * `1` - Martes
+        * `2` - Miércoles
+        * `3` - Jueves
+        * `4` - Viernes
+        * `5` - Sábado
+        * `6` - Domingo
+    EmpleadoNegocio:
+      type: object
+      description: Serializer para EmpleadoNegocio
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        usuario:
+          type: string
+          format: uuid
+        negocio:
+          type: string
+          format: uuid
+        tipo_empleado:
+          $ref: '#/components/schemas/TipoEmpleadoEnum'
+        especialidades:
+          type: string
+          description: Especialidades del empleado separadas por comas
+        activo:
+          type: boolean
+        fecha_incorporacion:
+          type: string
+          format: date
+          readOnly: true
+        fecha_baja:
+          type: string
+          format: date
+          nullable: true
+        puede_crear_citas:
+          type: boolean
+        puede_modificar_citas:
+          type: boolean
+        puede_cancelar_citas:
+          type: boolean
+        puede_gestionar_horarios:
+          type: boolean
+        puede_ver_estadisticas:
+          type: boolean
+        usuario_info:
+          allOf:
+          - $ref: '#/components/schemas/UsuarioPublic'
+          readOnly: true
+        negocio_info:
+          type: string
+          readOnly: true
+        especialidades_list:
+          type: string
+          readOnly: true
+      required:
+      - especialidades_list
+      - fecha_incorporacion
+      - id
+      - negocio
+      - negocio_info
+      - usuario
+      - usuario_info
+    EmpleadoNegocioRequest:
+      type: object
+      description: Serializer para EmpleadoNegocio
+      properties:
+        usuario:
+          type: string
+          format: uuid
+        negocio:
+          type: string
+          format: uuid
+        tipo_empleado:
+          $ref: '#/components/schemas/TipoEmpleadoEnum'
+        especialidades:
+          type: string
+          description: Especialidades del empleado separadas por comas
+        activo:
+          type: boolean
+        fecha_baja:
+          type: string
+          format: date
+          nullable: true
+        puede_crear_citas:
+          type: boolean
+        puede_modificar_citas:
+          type: boolean
+        puede_cancelar_citas:
+          type: boolean
+        puede_gestionar_horarios:
+          type: boolean
+        puede_ver_estadisticas:
+          type: boolean
+      required:
+      - negocio
+      - usuario
+    EstadoEnum:
+      enum:
+      - pendiente
+      - confirmada
+      - en_curso
+      - completada
+      - cancelada_cliente
+      - cancelada_negocio
+      - no_asistio
+      type: string
+      description: |-
+        * `pendiente` - Pendiente de Confirmación
+        * `confirmada` - Confirmada
+        * `en_curso` - En Curso
+        * `completada` - Completada
+        * `cancelada_cliente` - Cancelada por Cliente
+        * `cancelada_negocio` - Cancelada por Negocio
+        * `no_asistio` - No Asistió
+    EstadoPagoEnum:
+      enum:
+      - pendiente
+      - pagado
+      - fallido
+      - reembolsado
+      - cancelado
+      type: string
+      description: |-
+        * `pendiente` - Pendiente
+        * `pagado` - Pagado
+        * `fallido` - Fallido
+        * `reembolsado` - Reembolsado
+        * `cancelado` - Cancelado
+    EstadoSuscripcionEnum:
+      enum:
+      - activa
+      - pendiente_pago
+      - suspendida
+      - cancelada
+      - prueba
+      type: string
+      description: |-
+        * `activa` - Activa
+        * `pendiente_pago` - Pendiente de Pago
+        * `suspendida` - Suspendida
+        * `cancelada` - Cancelada
+        * `prueba` - Período de Prueba
+    FacturacionSuscripcion:
+      type: object
+      description: Serializer para FacturacionSuscripcion
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        negocio:
+          type: string
+          format: uuid
+        stripe_invoice_id:
+          type: string
+          maxLength: 100
+        stripe_payment_intent_id:
+          type: string
+          maxLength: 100
+        stripe_subscription_id:
+          type: string
+          maxLength: 100
+        monto:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        moneda:
+          type: string
+          maxLength: 3
+        periodo_inicio:
+          type: string
+          format: date
+        periodo_fin:
+          type: string
+          format: date
+        estado_pago:
+          $ref: '#/components/schemas/EstadoPagoEnum'
+        fecha_vencimiento:
+          type: string
+          format: date-time
+        fecha_pago:
+          type: string
+          format: date-time
+          nullable: true
+        numero_factura:
+          type: string
+          maxLength: 100
+        datos_fiscales: {}
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+        fecha_actualizacion:
+          type: string
+          format: date-time
+          readOnly: true
+        negocio_info:
+          type: string
+          readOnly: true
+        estado_pago_display:
+          type: string
+          readOnly: true
+        monto_formateado:
+          type: string
+          readOnly: true
+      required:
+      - estado_pago_display
+      - fecha_actualizacion
+      - fecha_creacion
+      - fecha_vencimiento
+      - id
+      - monto
+      - monto_formateado
+      - negocio
+      - negocio_info
+      - periodo_fin
+      - periodo_inicio
+      - stripe_invoice_id
+      - stripe_subscription_id
+    GeneroEnum:
+      enum:
+      - M
+      - F
+      - O
+      - N
+      type: string
+      description: |-
+        * `M` - Masculino
+        * `F` - Femenino
+        * `O` - Otro
+        * `N` - Prefiero no decirlo
+    HorarioNegocio:
+      type: object
+      description: Serializer para HorarioNegocio
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        negocio:
+          type: string
+          format: uuid
+        dia_semana:
+          allOf:
+          - $ref: '#/components/schemas/DiaSemanaEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+        hora_inicio:
+          type: string
+          format: time
+        hora_fin:
+          type: string
+          format: time
+        activo:
+          type: boolean
+        fecha_inicio_vigencia:
+          type: string
+          format: date
+          nullable: true
+        fecha_fin_vigencia:
+          type: string
+          format: date
+          nullable: true
+        dia_semana_display:
+          type: string
+          readOnly: true
+        negocio_info:
+          type: string
+          readOnly: true
+      required:
+      - dia_semana
+      - dia_semana_display
+      - hora_fin
+      - hora_inicio
+      - id
+      - negocio
+      - negocio_info
+    HorarioNegocioRequest:
+      type: object
+      description: Serializer para HorarioNegocio
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        dia_semana:
+          allOf:
+          - $ref: '#/components/schemas/DiaSemanaEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+        hora_inicio:
+          type: string
+          format: time
+        hora_fin:
+          type: string
+          format: time
+        activo:
+          type: boolean
+        fecha_inicio_vigencia:
+          type: string
+          format: date
+          nullable: true
+        fecha_fin_vigencia:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - dia_semana
+      - hora_fin
+      - hora_inicio
+      - negocio
+    Negocio:
+      type: object
+      description: Serializer para Negocio
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        propietario:
+          type: string
+          format: uuid
+          readOnly: true
+        categoria:
+          type: integer
+        nombre:
+          type: string
+          maxLength: 200
+        descripcion:
+          type: string
+        slug:
+          type: string
+          readOnly: true
+          description: URL amigable para el negocio
+          pattern: ^[-a-zA-Z0-9_]+$
+        telefono:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        sitio_web:
+          type: string
+          format: uri
+          maxLength: 200
+        direccion:
+          type: string
+        ciudad:
+          type: string
+          maxLength: 100
+        provincia:
+          type: string
+          maxLength: 100
+        codigo_postal:
+          type: string
+          maxLength: 10
+        latitud:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,8})?$
+          nullable: true
+        longitud:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,8})?$
+          nullable: true
+        logo:
+          type: string
+          format: uri
+          nullable: true
+        imagen_portada:
+          type: string
+          format: uri
+          nullable: true
+        zona_horaria:
+          type: string
+          maxLength: 50
+        tiempo_anticipacion_minimo:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Tiempo mínimo de anticipación para reservar cita (minutos)
+        tiempo_cancelacion_limite:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Tiempo límite para cancelar una cita sin penalización (minutos)
+        permite_reservas_multiples:
+          type: boolean
+        estado_suscripcion:
+          $ref: '#/components/schemas/EstadoSuscripcionEnum'
+        fecha_inicio_suscripcion:
+          type: string
+          format: date-time
+          nullable: true
+        fecha_fin_suscripcion:
+          type: string
+          format: date-time
+          nullable: true
+        calificacion_promedio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+          readOnly: true
+        total_reseñas:
+          type: integer
+          readOnly: true
+        activo:
+          type: boolean
+        verificado:
+          type: boolean
+          readOnly: true
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+        fecha_actualizacion:
+          type: string
+          format: date-time
+          readOnly: true
+        propietario_info:
+          allOf:
+          - $ref: '#/components/schemas/UsuarioPublic'
+          readOnly: true
+        categoria_info:
+          allOf:
+          - $ref: '#/components/schemas/CategoriaNegocio'
+          readOnly: true
+        suscripcion_activa:
+          type: boolean
+          readOnly: true
+        total_empleados:
+          type: string
+          readOnly: true
+        total_servicios:
+          type: string
+          readOnly: true
+      required:
+      - calificacion_promedio
+      - categoria
+      - categoria_info
+      - ciudad
+      - direccion
+      - email
+      - fecha_actualizacion
+      - fecha_creacion
+      - id
+      - nombre
+      - propietario
+      - propietario_info
+      - slug
+      - suscripcion_activa
+      - telefono
+      - total_empleados
+      - total_reseñas
+      - total_servicios
+      - verificado
+    NegocioRequest:
+      type: object
+      description: Serializer para Negocio
+      properties:
+        categoria:
+          type: integer
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 200
+        descripcion:
+          type: string
+        telefono:
+          type: string
+          minLength: 1
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        sitio_web:
+          type: string
+          format: uri
+          maxLength: 200
+        direccion:
+          type: string
+          minLength: 1
+        ciudad:
+          type: string
+          minLength: 1
+          maxLength: 100
+        provincia:
+          type: string
+          maxLength: 100
+        codigo_postal:
+          type: string
+          maxLength: 10
+        latitud:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,8})?$
+          nullable: true
+        longitud:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,8})?$
+          nullable: true
+        logo:
+          type: string
+          format: binary
+          nullable: true
+        imagen_portada:
+          type: string
+          format: binary
+          nullable: true
+        zona_horaria:
+          type: string
+          minLength: 1
+          maxLength: 50
+        tiempo_anticipacion_minimo:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Tiempo mínimo de anticipación para reservar cita (minutos)
+        tiempo_cancelacion_limite:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Tiempo límite para cancelar una cita sin penalización (minutos)
+        permite_reservas_multiples:
+          type: boolean
+        estado_suscripcion:
+          $ref: '#/components/schemas/EstadoSuscripcionEnum'
+        fecha_inicio_suscripcion:
+          type: string
+          format: date-time
+          nullable: true
+        fecha_fin_suscripcion:
+          type: string
+          format: date-time
+          nullable: true
+        activo:
+          type: boolean
+      required:
+      - categoria
+      - ciudad
+      - direccion
+      - email
+      - nombre
+      - telefono
+    PaginatedBloqueoHorarioList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BloqueoHorario'
+    PaginatedCategoriaNegocioList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoriaNegocio'
+    PaginatedCitaList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cita'
+    PaginatedConfiguracionPlataformaList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfiguracionPlataforma'
+    PaginatedEmpleadoNegocioList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmpleadoNegocio'
+    PaginatedFacturacionSuscripcionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacturacionSuscripcion'
+    PaginatedHorarioNegocioList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HorarioNegocio'
+    PaginatedNegocioList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Negocio'
+    PaginatedReseñaNegocioList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReseñaNegocio'
+    PaginatedServicioNegocioList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServicioNegocio'
+    PatchedBloqueoHorarioRequest:
+      type: object
+      description: Serializer para BloqueoHorario
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        empleado:
+          type: integer
+          nullable: true
+          description: Si se especifica, el bloqueo aplica solo a este empleado
+        fecha_inicio:
+          type: string
+          format: date-time
+        fecha_fin:
+          type: string
+          format: date-time
+        tipo_bloqueo:
+          $ref: '#/components/schemas/TipoBloqueoEnum'
+        motivo:
+          type: string
+        activo:
+          type: boolean
+    PatchedCitaRequest:
+      type: object
+      description: Serializer para Cita
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        cliente:
+          type: string
+          format: uuid
+        empleado:
+          type: integer
+          nullable: true
+        servicio:
+          type: integer
+        fecha_hora_inicio:
+          type: string
+          format: date-time
+        estado:
+          $ref: '#/components/schemas/EstadoEnum'
+        nombre_cliente:
+          type: string
+          minLength: 1
+          description: Nombre completo del cliente para la cita
+          maxLength: 200
+        telefono_cliente:
+          type: string
+          minLength: 1
+          maxLength: 20
+        email_cliente:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        notas_cliente:
+          type: string
+          description: Notas adicionales del cliente
+        notas_internas:
+          type: string
+          description: Notas internas del negocio
+        recordatorio_enviado:
+          type: boolean
+        confirmacion_enviada:
+          type: boolean
+        fecha_cancelacion:
+          type: string
+          format: date-time
+          nullable: true
+        cita_original:
+          type: string
+          format: uuid
+          nullable: true
+    PatchedEmpleadoNegocioRequest:
+      type: object
+      description: Serializer para EmpleadoNegocio
+      properties:
+        usuario:
+          type: string
+          format: uuid
+        negocio:
+          type: string
+          format: uuid
+        tipo_empleado:
+          $ref: '#/components/schemas/TipoEmpleadoEnum'
+        especialidades:
+          type: string
+          description: Especialidades del empleado separadas por comas
+        activo:
+          type: boolean
+        fecha_baja:
+          type: string
+          format: date
+          nullable: true
+        puede_crear_citas:
+          type: boolean
+        puede_modificar_citas:
+          type: boolean
+        puede_cancelar_citas:
+          type: boolean
+        puede_gestionar_horarios:
+          type: boolean
+        puede_ver_estadisticas:
+          type: boolean
+    PatchedHorarioNegocioRequest:
+      type: object
+      description: Serializer para HorarioNegocio
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        dia_semana:
+          allOf:
+          - $ref: '#/components/schemas/DiaSemanaEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+        hora_inicio:
+          type: string
+          format: time
+        hora_fin:
+          type: string
+          format: time
+        activo:
+          type: boolean
+        fecha_inicio_vigencia:
+          type: string
+          format: date
+          nullable: true
+        fecha_fin_vigencia:
+          type: string
+          format: date
+          nullable: true
+    PatchedNegocioRequest:
+      type: object
+      description: Serializer para Negocio
+      properties:
+        categoria:
+          type: integer
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 200
+        descripcion:
+          type: string
+        telefono:
+          type: string
+          minLength: 1
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        sitio_web:
+          type: string
+          format: uri
+          maxLength: 200
+        direccion:
+          type: string
+          minLength: 1
+        ciudad:
+          type: string
+          minLength: 1
+          maxLength: 100
+        provincia:
+          type: string
+          maxLength: 100
+        codigo_postal:
+          type: string
+          maxLength: 10
+        latitud:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,8})?$
+          nullable: true
+        longitud:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,8})?$
+          nullable: true
+        logo:
+          type: string
+          format: binary
+          nullable: true
+        imagen_portada:
+          type: string
+          format: binary
+          nullable: true
+        zona_horaria:
+          type: string
+          minLength: 1
+          maxLength: 50
+        tiempo_anticipacion_minimo:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Tiempo mínimo de anticipación para reservar cita (minutos)
+        tiempo_cancelacion_limite:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          description: Tiempo límite para cancelar una cita sin penalización (minutos)
+        permite_reservas_multiples:
+          type: boolean
+        estado_suscripcion:
+          $ref: '#/components/schemas/EstadoSuscripcionEnum'
+        fecha_inicio_suscripcion:
+          type: string
+          format: date-time
+          nullable: true
+        fecha_fin_suscripcion:
+          type: string
+          format: date-time
+          nullable: true
+        activo:
+          type: boolean
+    PatchedReseñaNegocioRequest:
+      type: object
+      description: Serializer para ReseñaNegocio
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        cita:
+          type: string
+          format: uuid
+          nullable: true
+        calificacion:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comentario:
+          type: string
+        calificacion_servicio:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        calificacion_atencion:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        calificacion_instalaciones:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        respuesta_negocio:
+          type: string
+        fecha_respuesta:
+          type: string
+          format: date-time
+          nullable: true
+        activa:
+          type: boolean
+    PatchedServicioNegocioRequest:
+      type: object
+      description: Serializer para ServicioNegocio
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 200
+        descripcion:
+          type: string
+        duracion_minutos:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        precio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        requiere_confirmacion:
+          type: boolean
+        disponible_online:
+          type: boolean
+        maximo_por_dia:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Límite máximo de este servicio por día
+        empleados_autorizados:
+          type: array
+          items:
+            type: integer
+          description: Si está vacío, todos los empleados pueden realizar este servicio
+        orden:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        activo:
+          type: boolean
+    PatchedUsuarioRequest:
+      type: object
+      description: Serializer para el modelo Usuario
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        tipo_usuario:
+          $ref: '#/components/schemas/TipoUsuarioEnum'
+        genero:
+          oneOf:
+          - $ref: '#/components/schemas/GeneroEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        fecha_nacimiento:
+          type: string
+          format: date
+          nullable: true
+        telefono:
+          type: string
+          description: Teléfono principal
+          maxLength: 20
+        telefono_alternativo:
+          type: string
+          maxLength: 20
+        direccion:
+          type: string
+          maxLength: 255
+        ciudad:
+          type: string
+          maxLength: 100
+        provincia:
+          type: string
+          maxLength: 100
+        codigo_postal:
+          type: string
+          maxLength: 10
+        pais:
+          type: string
+          minLength: 1
+          maxLength: 100
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        biografia:
+          type: string
+          description: Descripción personal breve
+          maxLength: 500
+        notificaciones_email:
+          type: boolean
+        notificaciones_sms:
+          type: boolean
+        notificaciones_push:
+          type: boolean
+        idioma_preferido:
+          type: string
+          minLength: 1
+          description: Código de idioma (es, en, etc.)
+          maxLength: 10
+        zona_horaria:
+          type: string
+          minLength: 1
+          maxLength: 50
+        email_verificado:
+          type: boolean
+        telefono_verificado:
+          type: boolean
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+    ReseñaNegocio:
+      type: object
+      description: Serializer para ReseñaNegocio
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        negocio:
+          type: string
+          format: uuid
+        cliente:
+          type: string
+          format: uuid
+          readOnly: true
+        cita:
+          type: string
+          format: uuid
+          nullable: true
+        calificacion:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comentario:
+          type: string
+        calificacion_servicio:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        calificacion_atencion:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        calificacion_instalaciones:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        respuesta_negocio:
+          type: string
+        fecha_respuesta:
+          type: string
+          format: date-time
+          nullable: true
+        activa:
+          type: boolean
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+        negocio_info:
+          type: string
+          readOnly: true
+        cliente_info:
+          allOf:
+          - $ref: '#/components/schemas/UsuarioPublic'
+          readOnly: true
+        cita_info:
+          type: string
+          readOnly: true
+      required:
+      - calificacion
+      - cita_info
+      - cliente
+      - cliente_info
+      - fecha_creacion
+      - id
+      - negocio
+      - negocio_info
+    ReseñaNegocioRequest:
+      type: object
+      description: Serializer para ReseñaNegocio
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        cita:
+          type: string
+          format: uuid
+          nullable: true
+        calificacion:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comentario:
+          type: string
+        calificacion_servicio:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        calificacion_atencion:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        calificacion_instalaciones:
+          type: integer
+          maximum: 5
+          minimum: 1
+          nullable: true
+        respuesta_negocio:
+          type: string
+        fecha_respuesta:
+          type: string
+          format: date-time
+          nullable: true
+        activa:
+          type: boolean
+      required:
+      - calificacion
+      - negocio
+    ServicioNegocio:
+      type: object
+      description: Serializer para ServicioNegocio
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        negocio:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+          maxLength: 200
+        descripcion:
+          type: string
+        duracion_minutos:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        precio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        requiere_confirmacion:
+          type: boolean
+        disponible_online:
+          type: boolean
+        maximo_por_dia:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Límite máximo de este servicio por día
+        empleados_autorizados:
+          type: array
+          items:
+            type: integer
+          description: Si está vacío, todos los empleados pueden realizar este servicio
+        orden:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        activo:
+          type: boolean
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+        negocio_info:
+          type: string
+          readOnly: true
+        empleados_autorizados_info:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsuarioPublic'
+          readOnly: true
+        precio_formateado:
+          type: string
+          readOnly: true
+      required:
+      - duracion_minutos
+      - empleados_autorizados_info
+      - fecha_creacion
+      - id
+      - negocio
+      - negocio_info
+      - nombre
+      - precio
+      - precio_formateado
+    ServicioNegocioRequest:
+      type: object
+      description: Serializer para ServicioNegocio
+      properties:
+        negocio:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 200
+        descripcion:
+          type: string
+        duracion_minutos:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        precio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        requiere_confirmacion:
+          type: boolean
+        disponible_online:
+          type: boolean
+        maximo_por_dia:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Límite máximo de este servicio por día
+        empleados_autorizados:
+          type: array
+          items:
+            type: integer
+          description: Si está vacío, todos los empleados pueden realizar este servicio
+        orden:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        activo:
+          type: boolean
+      required:
+      - duracion_minutos
+      - negocio
+      - nombre
+      - precio
+    TipoBloqueoEnum:
+      enum:
+      - vacaciones
+      - festivo
+      - mantenimiento
+      - personal
+      - otro
+      type: string
+      description: |-
+        * `vacaciones` - Vacaciones
+        * `festivo` - Día Festivo
+        * `mantenimiento` - Mantenimiento
+        * `personal` - Motivos Personales
+        * `otro` - Otro
+    TipoDatoEnum:
+      enum:
+      - string
+      - integer
+      - float
+      - boolean
+      - json
+      type: string
+      description: |-
+        * `string` - Texto
+        * `integer` - Entero
+        * `float` - Decimal
+        * `boolean` - Booleano
+        * `json` - JSON
+    TipoEmpleadoEnum:
+      enum:
+      - administrador
+      - empleado
+      - consultor
+      type: string
+      description: |-
+        * `administrador` - Administrador
+        * `empleado` - Empleado Regular
+        * `consultor` - Consultor/Freelancer
+    TipoUsuarioEnum:
+      enum:
+      - cliente
+      - negocio
+      - empleado
+      - admin
+      type: string
+      description: |-
+        * `cliente` - Cliente
+        * `negocio` - Propietario de Negocio
+        * `empleado` - Empleado
+        * `admin` - Administrador
+    Usuario:
+      type: object
+      description: Serializer para el modelo Usuario
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        tipo_usuario:
+          $ref: '#/components/schemas/TipoUsuarioEnum'
+        genero:
+          oneOf:
+          - $ref: '#/components/schemas/GeneroEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        fecha_nacimiento:
+          type: string
+          format: date
+          nullable: true
+        telefono:
+          type: string
+          description: Teléfono principal
+          maxLength: 20
+        telefono_alternativo:
+          type: string
+          maxLength: 20
+        direccion:
+          type: string
+          maxLength: 255
+        ciudad:
+          type: string
+          maxLength: 100
+        provincia:
+          type: string
+          maxLength: 100
+        codigo_postal:
+          type: string
+          maxLength: 10
+        pais:
+          type: string
+          maxLength: 100
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        biografia:
+          type: string
+          description: Descripción personal breve
+          maxLength: 500
+        notificaciones_email:
+          type: boolean
+        notificaciones_sms:
+          type: boolean
+        notificaciones_push:
+          type: boolean
+        idioma_preferido:
+          type: string
+          description: Código de idioma (es, en, etc.)
+          maxLength: 10
+        zona_horaria:
+          type: string
+          maxLength: 50
+        email_verificado:
+          type: boolean
+        telefono_verificado:
+          type: boolean
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+        fecha_actualizacion:
+          type: string
+          format: date-time
+          readOnly: true
+        ultima_actividad:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        nombre_completo:
+          type: string
+          readOnly: true
+        iniciales:
+          type: string
+          readOnly: true
+        es_propietario_negocio:
+          type: boolean
+          readOnly: true
+        tiene_perfil_completo:
+          type: boolean
+          readOnly: true
+      required:
+      - es_propietario_negocio
+      - fecha_actualizacion
+      - fecha_creacion
+      - id
+      - iniciales
+      - nombre_completo
+      - tiene_perfil_completo
+      - ultima_actividad
+      - username
+    UsuarioPublic:
+      type: object
+      description: Serializer público para mostrar información básica del usuario
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        biografia:
+          type: string
+          description: Descripción personal breve
+          maxLength: 500
+        nombre_completo:
+          type: string
+          readOnly: true
+        iniciales:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - iniciales
+      - nombre_completo
+      - username
+    UsuarioPublicRequest:
+      type: object
+      description: Serializer público para mostrar información básica del usuario
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        biografia:
+          type: string
+          description: Descripción personal breve
+          maxLength: 500
+      required:
+      - username
+    UsuarioRequest:
+      type: object
+      description: Serializer para el modelo Usuario
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        tipo_usuario:
+          $ref: '#/components/schemas/TipoUsuarioEnum'
+        genero:
+          oneOf:
+          - $ref: '#/components/schemas/GeneroEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        fecha_nacimiento:
+          type: string
+          format: date
+          nullable: true
+        telefono:
+          type: string
+          description: Teléfono principal
+          maxLength: 20
+        telefono_alternativo:
+          type: string
+          maxLength: 20
+        direccion:
+          type: string
+          maxLength: 255
+        ciudad:
+          type: string
+          maxLength: 100
+        provincia:
+          type: string
+          maxLength: 100
+        codigo_postal:
+          type: string
+          maxLength: 10
+        pais:
+          type: string
+          minLength: 1
+          maxLength: 100
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        biografia:
+          type: string
+          description: Descripción personal breve
+          maxLength: 500
+        notificaciones_email:
+          type: boolean
+        notificaciones_sms:
+          type: boolean
+        notificaciones_push:
+          type: boolean
+        idioma_preferido:
+          type: string
+          minLength: 1
+          description: Código de idioma (es, en, etc.)
+          maxLength: 10
+        zona_horaria:
+          type: string
+          minLength: 1
+          maxLength: 50
+        email_verificado:
+          type: boolean
+        telefono_verificado:
+          type: boolean
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - password_confirm
+      - username
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
