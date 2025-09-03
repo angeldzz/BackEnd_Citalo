@@ -15,3 +15,25 @@ pyvenv.cfg
 *.njsproj
 *.sln
 *.sw?
+
+# Django specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Testing and coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Environment variables
+.env.local
+.env.production
+
+# Backup files
+*.bak
